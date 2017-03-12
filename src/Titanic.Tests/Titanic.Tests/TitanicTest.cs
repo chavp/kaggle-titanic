@@ -18,6 +18,7 @@ namespace Titanic.Tests
 
         List<Passenger> trainData = new List<Passenger>();
         List<Passenger> testData = new List<Passenger>();
+        List<Passenger> fullData = new List<Passenger>();
         [TestInitialize]
         public void Setup()
         {
@@ -43,6 +44,10 @@ namespace Titanic.Tests
             }
 
             testData.FillNullValues();
+
+            //fullData = trainData.Union(testData).ToList();
+
+            //fullData.FillNullValues();
         }
 
         [TestMethod]
@@ -151,8 +156,6 @@ namespace Titanic.Tests
             var tCabD = trainData.Where(x => x.CabinType == CabinType.D).Count();
             var tCabE = trainData.Where(x => x.CabinType == CabinType.E).Count();
             var tCabF = trainData.Where(x => x.CabinType == CabinType.F).Count();
-            var tCabG = trainData.Where(x => x.CabinType == CabinType.G).Count();
-            var tCabT = trainData.Where(x => x.CabinType == CabinType.T).Count();
             var tCabU = trainData.Where(x => x.CabinType == CabinType.U).Count();
             Console.WriteLine("Survival rate by Cabin");
             var pCabA = (double)trainData.Where(x => x.Survived == 1 && x.CabinType == CabinType.A).Count() / tCabA;
@@ -161,8 +164,6 @@ namespace Titanic.Tests
             var pCabD = (double)trainData.Where(x => x.Survived == 1 && x.CabinType == CabinType.D).Count() / tCabD;
             var pCabE = (double)trainData.Where(x => x.Survived == 1 && x.CabinType == CabinType.E).Count() / tCabE;
             var pCabF = (double)trainData.Where(x => x.Survived == 1 && x.CabinType == CabinType.F).Count() / tCabF;
-            var pCabG = (double)trainData.Where(x => x.Survived == 1 && x.CabinType == CabinType.G).Count() / tCabG;
-            var pCabT = (double)trainData.Where(x => x.Survived == 1 && x.CabinType == CabinType.T).Count() / tCabT;
             var pCabU = (double)trainData.Where(x => x.Survived == 1 && x.CabinType == CabinType.U).Count() / tCabU;
             Console.WriteLine("p(CabA) = {0}", pCabA);
             Console.WriteLine("p(CabB) = {0}", pCabB);
@@ -170,8 +171,6 @@ namespace Titanic.Tests
             Console.WriteLine("p(CabD) = {0}", pCabD);
             Console.WriteLine("p(CabE) = {0}", pCabE);
             Console.WriteLine("p(CabF) = {0}", pCabF);
-            Console.WriteLine("p(CabG) = {0}", pCabG);
-            Console.WriteLine("p(CabT) = {0}", pCabT);
             Console.WriteLine("p(CabU) = {0}", pCabU);
             Console.WriteLine("------------------------------------------------------");
 
@@ -182,6 +181,30 @@ namespace Titanic.Tests
             var pMNo = (double)trainData.Where(x => x.Survived == 1 && x.Mother == Mother.No).Count() / tMNo;
             Console.WriteLine("p(Mother) = {0}", pMYes);
             Console.WriteLine("p(Not Mother) = {0}", pMNo);
+            Console.WriteLine("------------------------------------------------------");
+
+            var tFlo = trainData.Where(x => x.FareRate == FareRate.Lo).Count();
+            var tFme = trainData.Where(x => x.FareRate == FareRate.Me).Count();
+            var tFhi = trainData.Where(x => x.FareRate == FareRate.Hi).Count();
+            Console.WriteLine("Survival rate by FareRate");
+            var pFlo = (double)trainData.Where(x => x.Survived == 1 && x.FareRate == FareRate.Lo).Count() / tFlo;
+            var pFme = (double)trainData.Where(x => x.Survived == 1 && x.FareRate == FareRate.Me).Count() / tFme;
+            var pFhi = (double)trainData.Where(x => x.Survived == 1 && x.FareRate == FareRate.Hi).Count() / tFhi;
+            Console.WriteLine("p(Lo) = {0}", pFlo);
+            Console.WriteLine("p(Me) = {0}", pFme);
+            Console.WriteLine("p(Hi) = {0}", pFhi);
+            Console.WriteLine("------------------------------------------------------");
+
+            var tP1 = trainData.Where(x => x.PclassLevel == PclassLevel.One).Count();
+            var tP2 = trainData.Where(x => x.PclassLevel == PclassLevel.Two).Count();
+            var tP3 = trainData.Where(x => x.PclassLevel == PclassLevel.Three).Count();
+            Console.WriteLine("Survival rate by PclassLevel");
+            var pP1 = (double)trainData.Where(x => x.Survived == 1 && x.PclassLevel == PclassLevel.One).Count() / tP1;
+            var pP2 = (double)trainData.Where(x => x.Survived == 1 && x.PclassLevel == PclassLevel.Two).Count() / tP2;
+            var pP3 = (double)trainData.Where(x => x.Survived == 1 && x.PclassLevel == PclassLevel.Three).Count() / tP3;
+            Console.WriteLine("p(Pclass 1) = {0}", pP1);
+            Console.WriteLine("p(Pclass 2) = {0}", pP2);
+            Console.WriteLine("p(Pclass 3) = {0}", pP3);
         }
 
         [TestMethod]
@@ -194,6 +217,8 @@ namespace Titanic.Tests
             var giTitle = GI<Titles>("Title", trainData);
             var giCabinType = GI<CabinType>("CabinType", trainData);
             var giMother = GI<Mother>("Mother", trainData);
+            var giFareRate = GI<FareRate>("FareRate", trainData);
+            var giPclass = GI<PclassLevel>("PclassLevel", trainData);
 
             Console.WriteLine("Sex = {0}", giSex);
             Console.WriteLine("FamilySize = {0}", giFamilySize);
@@ -202,7 +227,14 @@ namespace Titanic.Tests
             Console.WriteLine("AgeOrdinal = {0}", giAgeOrdinal);
             Console.WriteLine("Title = {0}", giTitle);
             Console.WriteLine("CabinType = {0}", giCabinType);
+            Console.WriteLine("FareRate = {0}", giFareRate);
+            Console.WriteLine("PclassLevel = {0}", giPclass);
         }
+
+        List<string> gi_order_fields = new List<string>
+        {
+            "Sex", "PclassLevel", "CabinType", "FareRate", "FamilySize", "Embarked", "Mother", "AgeOrdinal", "Title"
+        };
 
         [TestMethod]
         public void validate()
@@ -217,10 +249,7 @@ namespace Titanic.Tests
             var model = BuildDecisionTree(trainData);
             foreach (var item in trainData)
             {
-                var sur = model.Predict(item, new List<string>
-                {
-                    "Sex", "FamilySize", "Embarked", "Mother", "AgeOrdinal", "Title"
-                });
+                var sur = model.Predict(item, gi_order_fields);
 
                 if (sur.HasValue)
                 {
@@ -241,6 +270,8 @@ namespace Titanic.Tests
             }
 
             Console.WriteLine("accuracy = {0}", (double)colect / trainData.Count);
+
+            // accuracy = 0.89337822671156
         }
 
         [TestMethod]
@@ -250,10 +281,7 @@ namespace Titanic.Tests
             foreach (var item in testData)
             {
                 // Outlook
-                var sur = model.Predict(item, new List<string>
-                {
-                    "Sex", "FamilySize", "Embarked", "Mother", "AgeOrdinal", "Title"
-                });
+                var sur = model.Predict(item, gi_order_fields);
 
                 item.Survived = sur.Value;
             }
@@ -334,31 +362,40 @@ namespace Titanic.Tests
                 DataSet = trainData
             };
 
-            //BuildChildNode<Outlook>(root, "Outlook", dataSet);
-
+            // "Sex", "PclassLevel", "CabinType", "FareRate", "FamilySize", "Embarked", "Mother", "AgeOrdinal", "Title"
             BuildChildNode<Gender>("Sex", root);
             foreach (var item in root.Children)
             {
-                BuildChildNode<FamilySize>("FamilySize", item);
+                BuildChildNode<PclassLevel>("PclassLevel", item);
 
                 foreach (var item2 in item.Children)
                 {
-                    BuildChildNode<Embarked>("Embarked", item2);
+                    BuildChildNode<CabinType>("CabinType", item2);
 
                     foreach (var item3 in item2.Children)
                     {
-                        BuildChildNode<Mother>("Mother", item3);
+                        BuildChildNode<FareRate>("FareRate", item3);
                         foreach (var item4 in item3.Children)
                         {
-                            BuildChildNode<AgeOrdinal>("AgeOrdinal", item4);
+                            BuildChildNode<FamilySize>("FamilySize", item4);
 
                             foreach (var item5 in item4.Children)
                             {
-                                BuildChildNode<Titles>("Title", item5);
+                                BuildChildNode<Embarked>("Embarked", item5);
 
                                 foreach (var item6 in item5.Children)
                                 {
-                                    BuildChildNode<CabinType>("CabinType", item6);
+                                    BuildChildNode<Mother>("Mother", item6);
+
+                                    foreach (var item7 in item6.Children)
+                                    {
+                                        BuildChildNode<AgeOrdinal>("AgeOrdinal", item7);
+
+                                        foreach (var item8 in item7.Children)
+                                        {
+                                            BuildChildNode<Titles>("Title", item8);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -452,8 +489,9 @@ namespace Titanic.Tests
         {
             get
             {
-                if (string.IsNullOrEmpty(Cabin)) return CabinType.U;
+                if (string.IsNullOrEmpty(Cabin) || Cabin == "T") return CabinType.U;
                 var cabit = Cabin.First().ToString();
+                if (cabit == "G") cabit = "F";
                 return (CabinType)Enum.Parse(typeof(CabinType), cabit, true);
             }
         }
@@ -465,7 +503,8 @@ namespace Titanic.Tests
                 if (Sex == Gender.Female
                     && Parch > 0
                     && Age > 18
-                    && Title != Titles.Miss)
+                    && Title != Titles.Miss
+                    )
                 {
                     return Mother.Yes;
                 }
@@ -474,7 +513,33 @@ namespace Titanic.Tests
             }
         }
 
-        
+        public FareRate FareRate
+        {
+            get
+            {
+                if (Fare < 15) return FareRate.Lo;
+                if (15 < Fare && Fare <= 40) return FareRate.Me;
+                if (40 < Fare) return FareRate.Hi;
+                return FareRate.Me;
+            }
+        }
+
+        public PclassLevel PclassLevel
+        {
+            get
+            {
+                if (Pclass == 1) return PclassLevel.One;
+                if (Pclass == 2) return PclassLevel.Two;
+                if (Pclass == 3) return PclassLevel.Three;
+                return PclassLevel.Two;
+            }
+        }
+
+    }
+
+    public enum PclassLevel
+    {
+        One, Two, Three
     }
 
     public enum Survived
@@ -509,12 +574,17 @@ namespace Titanic.Tests
 
     public enum CabinType
     {
-        A, B, C, D, E, F, G, T, U
+        A, B, C, D, E, F, U
     }
 
     public enum Mother
     {
         Yes, No
+    }
+
+    public enum FareRate
+    {
+        Lo, Me, Hi
     }
 
     public static class PassengerExtension
@@ -638,7 +708,7 @@ namespace Titanic.Tests
             {
                 //int result = s_Generator.NextDouble() <= P ? 1 : 0;
                 //return result;
-                int result = P > 0.5 ? 1 : 0;
+                int result = P > (1 - 0.38) ? 1 : 0;
                 return result;
             }
             var ch1 = Children.Where(x => x.FieldName == UnitTest1.GetPropValue(item, fields.First()).ToString()).Single();
