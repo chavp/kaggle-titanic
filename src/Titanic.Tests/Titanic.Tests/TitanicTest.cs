@@ -78,11 +78,11 @@ namespace Titanic.Tests
             Console.WriteLine("p(S) = {0}", pS);
             Console.WriteLine("------------------------------------------------------");
 
-            var tM = trainData.Where(x => x.Sex == Sex.Male).Count();
-            var tF = trainData.Where(x => x.Sex == Sex.Female).Count();
+            var tM = trainData.Where(x => x.Sex == Gender.Male).Count();
+            var tF = trainData.Where(x => x.Sex == Gender.Female).Count();
             Console.WriteLine("Survival rate by Sex");
-            var pM = (double)trainData.Where(x => x.Survived == 1 && x.Sex == Sex.Male).Count() / tM;
-            var pF = (double)trainData.Where(x => x.Survived == 1 && x.Sex == Sex.Female).Count() / tF;
+            var pM = (double)trainData.Where(x => x.Survived == 1 && x.Sex == Gender.Male).Count() / tM;
+            var pF = (double)trainData.Where(x => x.Survived == 1 && x.Sex == Gender.Female).Count() / tF;
             Console.WriteLine("p(M) = {0}", pM);
             Console.WriteLine("p(F) = {0}", pF);
             Console.WriteLine("------------------------------------------------------");
@@ -249,7 +249,7 @@ namespace Titanic.Tests
                 dicofGi.Add(fieldName, gi);
             }
 
-            foreach (var item in dicofGi)
+            foreach (var item in dicofGi.OrderByDescending(x => x.Value))
             {
                 Console.WriteLine("{0} = {1}", item.Key, item.Value);
             }
@@ -323,6 +323,7 @@ namespace Titanic.Tests
             // accuracy = 0.874298540965208
             // accuracy = 0.898989898989899
             // accuracy = 0.904601571268238
+            // accuracy = 0.84287317620651
         }
 
         [TestMethod]
@@ -485,59 +486,7 @@ namespace Titanic.Tests
                 DataSet = trainData
             };
 
-            //"Sex", "PclassLevel", "Title", "CabinType", "FareRate", "FamilySize", "Embarked", "Mother", "AgeOrdinal", "HaveParch", "HaveSibsp"
-            //var bufferList = GetMaximizeGi(gi_order_fields, trainData);
-            //var bufferList = gi_order_fields.ToList();
-
             BuildChildNode(targetFieldNames, root);
-            //foreach (var item in root.Children)
-            //{
-            //    BuildChildNode<PclassLevel>("PclassLevel", item);
-
-            //    foreach (var item2 in item.Children)
-            //    {
-            //        BuildChildNode<Titles>("Title", item2);
-
-            //        foreach (var item3 in item2.Children)
-            //        {
-            //            BuildChildNode<CabinType>("CabinType", item3);
-            //            foreach (var item4 in item3.Children)
-            //            {
-            //                BuildChildNode<FareRate>("FareRate", item4);
-
-            //                foreach (var item5 in item4.Children)
-            //                {
-            //                    BuildChildNode<FamilySize>("FamilySize", item5);
-
-            //                    foreach (var item6 in item5.Children)
-            //                    {
-            //                        BuildChildNode<Embarked>("Embarked", item6);
-
-            //                        foreach (var item7 in item6.Children)
-            //                        {
-            //                            BuildChildNode<Mother>("Mother", item7);
-
-            //                            foreach (var item8 in item7.Children)
-            //                            {
-            //                                BuildChildNode<AgeOrdinal>("AgeOrdinal", item8);
-
-            //                                //foreach (var item9 in item8.Children)
-            //                                //{
-            //                                //    BuildChildNode<HaveParch>("HaveParch", item9);
-
-            //                                //    foreach (var item10 in item9.Children)
-            //                                //    {
-            //                                //        BuildChildNode<HaveSibsp>("HaveSibsp", item10);
-            //                                //    }
-            //                                //}
-            //                            }
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
 
             return root;
         }
@@ -584,7 +533,7 @@ namespace Titanic.Tests
         public int? Survived { get; set; }
         public int Pclass { get; set; }
         public string Name { get; set; }
-        public Sex? Sex { get; set; }
+        public Gender? Sex { get; set; }
         public int? Age { get; set; }
         public int SibSp { get; set; }
         public int Parch { get; set; }
@@ -647,7 +596,7 @@ namespace Titanic.Tests
         {
             get
             {
-                if (Sex == Tests.Sex.Female
+                if (Sex == Tests.Gender.Female
                     && Parch > 0
                     && Age > 18
                     && Title != Titles.Miss
@@ -719,7 +668,7 @@ namespace Titanic.Tests
         Yes, No
     }
 
-    public enum Sex
+    public enum Gender
     {
         Male, Female
     }
@@ -794,7 +743,7 @@ namespace Titanic.Tests
             string sex = null;
             if (csv.TryGetField<string>("Sex", out sex))
             {
-                p.Sex = (Sex)Enum.Parse(typeof(Sex), sex, true);
+                p.Sex = (Gender)Enum.Parse(typeof(Gender), sex, true);
             }
 
             int? age = null;
@@ -886,20 +835,33 @@ namespace Titanic.Tests
         public int? Predict(Passenger item, IEnumerable<string> fields)
         {
             if (CountNo == 0) return 1;
+
             if (fields.Count() == 0)
             {
-                //int result = s_Generator.NextDouble() <= P ? 1 : 0;
+                return guessResult();
+                //int result = P > 0.5 ? 1 : 0;
                 //return result;
-                int result = P > 0.5 ? 1 : 0;
-                return result;
             }
+
             var field = fields.First();
             //string.Format("{0}.{1}", pFieldName, node1),
             var val = UnitTest1.GetPropValue(item, field).ToString();
             var fieldName = string.Format("{0}.{1}", field, val);
-            var ch1 = Children.Where(x => x.FieldName == fieldName).Single();
+            var ch1 = Children.Where(x => x.FieldName == fieldName).SingleOrDefault();
+            if(ch1 == null)
+            {
+                return guessResult();
+            }
             if (ch1.CountNo == 0) return 1;
             return ch1.Predict(item, fields.Skip(1));
+        }
+
+        private int guessResult()
+        {
+            int result = s_Generator.NextDouble() <= P ? 1 : 0;
+            return result;
+            //int result = P > 0.5 ? 1 : 0;
+            //return result;
         }
     }
 
