@@ -72,7 +72,7 @@ namespace Titanic.Tests
 
             var predictDataSet = new List<bool>();
 
-            var model = DecisionTree();
+            var model = BuildDecisionTree();
             foreach (var item in dataSet)
             {
                 // Outlook
@@ -98,7 +98,7 @@ namespace Titanic.Tests
             Console.WriteLine("{0}", (double)colect / dataSet.Count);
         }
 
-        public Node DecisionTree()
+        public Node BuildDecisionTree()
         {
             var root = new Node
             {
@@ -109,21 +109,50 @@ namespace Titanic.Tests
                 DataSet = dataSet
             };
 
-            //BuildChildNode<Outlook>(root, "Outlook", dataSet);
+            BuildChildNode(new List<string> { "Outlook", "Humanity", "Windy" }, root);
+            //BuildChildNode<Outlook>("Outlook", root);
+            //foreach (var item in root.Children)
+            //{
+            //    BuildChildNode<Humanity>("Humanity", item);
 
-            BuildChildNode<Outlook>("Outlook", root);
-            foreach (var item in root.Children)
-            {
-                BuildChildNode<Humanity>("Humanity", item);
-
-                foreach (var item2 in item.Children)
-                {
-                    BuildChildNode<Windy>("Windy", item2);
-                }
-            }
+            //    foreach (var item2 in item.Children)
+            //    {
+            //        BuildChildNode<Windy>("Windy", item2);
+            //    }
+            //}
             return root;
         }
 
+        public void BuildChildNode(List<string> pFieldNames, Node parent)
+        {
+            if (pFieldNames.Count == 0) return;
+
+            var pFieldName = pFieldNames.First();
+
+            BuildChildNode(pFieldName, parent);
+            foreach (var item in parent.Children)
+            {
+                BuildChildNode(pFieldNames.Skip(1).ToList(), item);
+            }
+        }
+        public void BuildChildNode(string pFieldName, Node parent)
+        {
+            var listOfDistinData = parent.DataSet.Select(x => GetPropValue(x, pFieldName)).Distinct();
+            foreach (var node1 in listOfDistinData)
+            {
+                var node_1_list = parent.DataSet.Where(x => GetPropValue(x, pFieldName).Equals(node1)).ToList();
+                var n1 = new Node
+                {
+                    FieldName = Convert.ToString(node1),
+                    Count = node_1_list.Count,
+                    CountYes = node_1_list.Where(x => x.Play).Count(),
+                    DataSet = node_1_list,
+                };
+                parent.Children.Add(n1);
+            }
+        }
+
+        [Obsolete]
         public void BuildChildNode<E>(string pFieldName, Node parent)
             where E : struct, IComparable, IFormattable, IConvertible
         {

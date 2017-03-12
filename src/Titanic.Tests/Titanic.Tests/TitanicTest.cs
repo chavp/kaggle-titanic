@@ -78,11 +78,11 @@ namespace Titanic.Tests
             Console.WriteLine("p(S) = {0}", pS);
             Console.WriteLine("------------------------------------------------------");
 
-            var tM = trainData.Where(x => x.Sex == Gender.Male).Count();
-            var tF = trainData.Where(x => x.Sex == Gender.Female).Count();
+            var tM = trainData.Where(x => x.Sex == Sex.Male).Count();
+            var tF = trainData.Where(x => x.Sex == Sex.Female).Count();
             Console.WriteLine("Survival rate by Sex");
-            var pM = (double)trainData.Where(x => x.Survived == 1 && x.Sex == Gender.Male).Count() / tM;
-            var pF = (double)trainData.Where(x => x.Survived == 1 && x.Sex == Gender.Female).Count() / tF;
+            var pM = (double)trainData.Where(x => x.Survived == 1 && x.Sex == Sex.Male).Count() / tM;
+            var pF = (double)trainData.Where(x => x.Survived == 1 && x.Sex == Sex.Female).Count() / tF;
             Console.WriteLine("p(M) = {0}", pM);
             Console.WriteLine("p(F) = {0}", pF);
             Console.WriteLine("------------------------------------------------------");
@@ -205,36 +205,81 @@ namespace Titanic.Tests
             Console.WriteLine("p(Pclass 1) = {0}", pP1);
             Console.WriteLine("p(Pclass 2) = {0}", pP2);
             Console.WriteLine("p(Pclass 3) = {0}", pP3);
-        }
+            Console.WriteLine("------------------------------------------------------");
 
+            var tFYes = trainData.Where(x => x.HaveParch == HaveParch.Yes).Count();
+            var tFNo = trainData.Where(x => x.HaveParch == HaveParch.No).Count();
+            Console.WriteLine("Survival rate by HaveParch");
+            var pFYes = (double)trainData.Where(x => x.Survived == 1 && x.HaveParch == HaveParch.Yes).Count() / tFYes;
+            var pFNo = (double)trainData.Where(x => x.Survived == 1 && x.HaveParch == HaveParch.No).Count() / tFNo;
+            Console.WriteLine("p(HaveParch.Yes) = {0}", pFYes);
+            Console.WriteLine("p(HaveParch.No) = {0}", pFNo);
+            Console.WriteLine("------------------------------------------------------");
+
+            var tSYes = trainData.Where(x => x.HaveSibsp == HaveSibsp.Yes).Count();
+            var tSNo = trainData.Where(x => x.HaveSibsp == HaveSibsp.No).Count();
+            Console.WriteLine("Survival rate by HaveSibsp");
+            var pSYes = (double)trainData.Where(x => x.Survived == 1 && x.HaveSibsp == HaveSibsp.Yes).Count() / tSYes;
+            var pSNo = (double)trainData.Where(x => x.Survived == 1 && x.HaveSibsp == HaveSibsp.No).Count() / tSNo;
+            Console.WriteLine("p(HaveSibsp.Yes) = {0}", pSYes);
+            Console.WriteLine("p(HaveSibsp.No) = {0}", pSNo);
+            Console.WriteLine("------------------------------------------------------");
+        }
+        List<string> gi_order_fields = new List<string>
+        {
+            "Sex",
+            "PclassLevel",
+            "Title",
+            "CabinType",
+            "FareRate",
+            "FamilySize",
+            "Embarked",
+            "Mother",
+            "AgeOrdinal",
+            "HaveParch",
+            "HaveSibsp"
+        };
         [TestMethod]
         public void cal_gi()
         {
-            var giSex = GI<Gender>("Sex", trainData);
-            var giEmbarked = GI<Embarked>("Embarked", trainData);
-            var giFamilySize = GI<FamilySize>("FamilySize", trainData);
-            var giAgeOrdinal = GI<AgeOrdinal>("AgeOrdinal", trainData);
-            var giTitle = GI<Titles>("Title", trainData);
-            var giCabinType = GI<CabinType>("CabinType", trainData);
-            var giMother = GI<Mother>("Mother", trainData);
-            var giFareRate = GI<FareRate>("FareRate", trainData);
-            var giPclass = GI<PclassLevel>("PclassLevel", trainData);
+            var dicofGi = new Dictionary<string, double>();
+            foreach (var fieldName in gi_order_fields)
+            {
+                var gi = GI(fieldName, trainData);
+                dicofGi.Add(fieldName, gi);
+            }
 
-            Console.WriteLine("Sex = {0}", giSex);
-            Console.WriteLine("FamilySize = {0}", giFamilySize);
-            Console.WriteLine("Embarked = {0}", giEmbarked);
-            Console.WriteLine("Mother = {0}", giMother);
-            Console.WriteLine("AgeOrdinal = {0}", giAgeOrdinal);
-            Console.WriteLine("Title = {0}", giTitle);
-            Console.WriteLine("CabinType = {0}", giCabinType);
-            Console.WriteLine("FareRate = {0}", giFareRate);
-            Console.WriteLine("PclassLevel = {0}", giPclass);
+            foreach (var item in dicofGi)
+            {
+                Console.WriteLine("{0} = {1}", item.Key, item.Value);
+            }
+
+           // gi_order_fields = dicofGi.OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+
+            //var giSex = GI<Gender>("Sex", trainData);
+            //var giEmbarked = GI<Embarked>("Embarked", trainData);
+            //var giFamilySize = GI<FamilySize>("FamilySize", trainData);
+            //var giAgeOrdinal = GI<AgeOrdinal>("AgeOrdinal", trainData);
+            //var giTitle = GI<Titles>("Title", trainData);
+            //var giCabinType = GI<CabinType>("CabinType", trainData);
+            //var giMother = GI<Mother>("Mother", trainData);
+            //var giFareRate = GI<FareRate>("FareRate", trainData);
+            //var giPclass = GI<PclassLevel>("PclassLevel", trainData);
+            //var giHaveParch = GI<HaveParch>("HaveParch", trainData);
+            //var giHaveSibsp = GI<HaveSibsp>("HaveSibsp", trainData);
+
+            //Console.WriteLine("Sex = {0}", giSex);
+            //Console.WriteLine("FamilySize = {0}", giFamilySize);
+            //Console.WriteLine("Embarked = {0}", giEmbarked);
+            //Console.WriteLine("Mother = {0}", giMother);
+            //Console.WriteLine("AgeOrdinal = {0}", giAgeOrdinal);
+            //Console.WriteLine("Title = {0}", giTitle);
+            //Console.WriteLine("CabinType = {0}", giCabinType);
+            //Console.WriteLine("FareRate = {0}", giFareRate);
+            //Console.WriteLine("PclassLevel = {0}", giPclass);
+            //Console.WriteLine("HaveParch = {0}", giHaveParch);
+            //Console.WriteLine("HaveSibsp = {0}", giHaveSibsp);
         }
-
-        List<string> gi_order_fields = new List<string>
-        {
-            "Sex", "PclassLevel", "CabinType", "FareRate", "FamilySize", "Embarked", "Mother", "AgeOrdinal", "Title"
-        };
 
         [TestMethod]
         public void validate()
@@ -246,10 +291,13 @@ namespace Titanic.Tests
             int incolect = 0;
 
             var predictDataSet = new List<int>();
-            var model = BuildDecisionTree(trainData);
+            var targetFieldList = GetMaximizeGi(gi_order_fields, trainData);
+
+            var model = BuildDecisionTree(targetFieldList, trainData);
+
             foreach (var item in trainData)
             {
-                var sur = model.Predict(item, gi_order_fields);
+                var sur = model.Predict(item, targetFieldList);
 
                 if (sur.HasValue)
                 {
@@ -272,16 +320,20 @@ namespace Titanic.Tests
             Console.WriteLine("accuracy = {0}", (double)colect / trainData.Count);
 
             // accuracy = 0.89337822671156
+            // accuracy = 0.874298540965208
+            // accuracy = 0.898989898989899
+            // accuracy = 0.904601571268238
         }
 
         [TestMethod]
         public void prediction()
         {
-            var model = BuildDecisionTree(trainData);
+            var targetFieldList = GetMaximizeGi(gi_order_fields, trainData);
+            var model = BuildDecisionTree(targetFieldList, trainData);
             foreach (var item in testData)
             {
                 // Outlook
-                var sur = model.Predict(item, gi_order_fields);
+                var sur = model.Predict(item, targetFieldList);
 
                 item.Survived = sur.Value;
             }
@@ -289,22 +341,23 @@ namespace Titanic.Tests
             testData.WriteSubmission(Path.Combine(submission_root, "gender_submission.csv"));
         }
 
-        public double GI<E>(string pFieldName, List<Passenger> dataSet)
-            where E : struct, IComparable, IFormattable, IConvertible
+        public double GI(string pFieldName, List<Passenger> dataSet)
         {
             double gi = 0;
-
+            var listOfDistinData = dataSet.Select(x => UnitTest1.GetPropValue(x, pFieldName)).Distinct();
             double total = dataSet.Count;
             double cYes = (from x in dataSet where x.Survived == 1 select x).Count();
 
             List<double> childsE = new List<double>();
             List<double> childsP = new List<double>();
-            foreach (var item in Enum.GetValues(typeof(E)))
+            foreach (var item in listOfDistinData)
             {
-                var en = (E)item;
+                //var en = (E)item;
 
-                double t = (from x in dataSet where UnitTest1.GetPropValue(x, pFieldName).Equals(en) select x).Count();
-                double cCYes = (from x in dataSet where x.Survived == 1 && UnitTest1.GetPropValue(x, pFieldName).Equals(en) select x).Count();
+                double t = (from x in dataSet where UnitTest1.GetPropValue(x, pFieldName).Equals(item) select x).Count();
+                double cCYes = (from x in dataSet where x.Survived == 1 && UnitTest1.GetPropValue(x, pFieldName).Equals(item) select x).Count();
+
+                if (t == 0) continue;
 
                 var e = UnitTest1.Entropy(cCYes / t);
                 var p = t / total;
@@ -326,6 +379,46 @@ namespace Titanic.Tests
             return gi;
         }
 
+        public double GI<E>(string pFieldName, List<Passenger> dataSet)
+            where E : struct, IComparable, IFormattable, IConvertible
+        {
+            double gi = 0;
+
+            double total = dataSet.Count;
+            double cYes = (from x in dataSet where x.Survived == 1 select x).Count();
+
+            List<double> childsE = new List<double>();
+            List<double> childsP = new List<double>();
+            foreach (var item in Enum.GetValues(typeof(E)))
+            {
+                var en = (E)item;
+
+                double t = (from x in dataSet where UnitTest1.GetPropValue(x, pFieldName).Equals(en) select x).Count();
+                double cCYes = (from x in dataSet where x.Survived == 1 && UnitTest1.GetPropValue(x, pFieldName).Equals(en) select x).Count();
+
+                if (t == 0) continue;
+
+                var e = UnitTest1.Entropy(cCYes / t);
+                var p = t / total;
+
+                childsE.Add(e);
+                childsP.Add(p);
+            }
+
+            var eP = UnitTest1.Entropy(cYes / total);
+
+            double wEC = 0;
+            for (int i = 0; i < childsE.Count; i++)
+            {
+                wEC += childsE[i] * childsP[i];
+            }
+
+            gi = eP - wEC;
+
+            return gi;
+        }
+
+        [Obsolete]
         public void BuildChildNode<E>(string pFieldName, TitanicNode parent)
             where E : struct, IComparable, IFormattable, IConvertible
         {
@@ -351,7 +444,37 @@ namespace Titanic.Tests
             }
         }
 
-        public TitanicNode BuildDecisionTree(List<Passenger> trainData)
+        public void BuildChildNode(List<string> pFieldNames, TitanicNode parent)
+        {
+            if (pFieldNames.Count == 0) return;
+
+            var pFieldName = pFieldNames.First();
+            pFieldNames = pFieldNames.Skip(1).ToList();
+
+            BuildChildNode(pFieldName, parent);
+            foreach (var item in parent.Children)
+            {
+                BuildChildNode(pFieldNames, item);
+            }
+        }
+        public void BuildChildNode(string pFieldName, TitanicNode parent)
+        {
+            var listOfDistinData = parent.DataSet.Select(x => UnitTest1.GetPropValue(x, pFieldName)).Distinct();
+            foreach (var node1 in listOfDistinData)
+            {
+                var node_1_list = parent.DataSet.Where(x => UnitTest1.GetPropValue(x, pFieldName).Equals(node1)).ToList();
+                var n1 = new TitanicNode
+                {
+                    FieldName = string.Format("{0}.{1}", pFieldName, node1),
+                    Count = node_1_list.Count,
+                    CountYes = node_1_list.Where(x => x.Survived == 1).Count(),
+                    DataSet = node_1_list,
+                };
+                parent.Children.Add(n1);
+            }
+        }
+
+        public TitanicNode BuildDecisionTree(List<string> targetFieldNames, List<Passenger> trainData)
         {
             var root = new TitanicNode
             {
@@ -362,50 +485,74 @@ namespace Titanic.Tests
                 DataSet = trainData
             };
 
-            // "Sex", "PclassLevel", "CabinType", "FareRate", "FamilySize", "Embarked", "Mother", "AgeOrdinal", "Title"
-            BuildChildNode<Gender>("Sex", root);
-            foreach (var item in root.Children)
-            {
-                BuildChildNode<PclassLevel>("PclassLevel", item);
+            //"Sex", "PclassLevel", "Title", "CabinType", "FareRate", "FamilySize", "Embarked", "Mother", "AgeOrdinal", "HaveParch", "HaveSibsp"
+            //var bufferList = GetMaximizeGi(gi_order_fields, trainData);
+            //var bufferList = gi_order_fields.ToList();
 
-                foreach (var item2 in item.Children)
-                {
-                    BuildChildNode<CabinType>("CabinType", item2);
+            BuildChildNode(targetFieldNames, root);
+            //foreach (var item in root.Children)
+            //{
+            //    BuildChildNode<PclassLevel>("PclassLevel", item);
 
-                    foreach (var item3 in item2.Children)
-                    {
-                        BuildChildNode<FareRate>("FareRate", item3);
-                        foreach (var item4 in item3.Children)
-                        {
-                            BuildChildNode<FamilySize>("FamilySize", item4);
+            //    foreach (var item2 in item.Children)
+            //    {
+            //        BuildChildNode<Titles>("Title", item2);
 
-                            foreach (var item5 in item4.Children)
-                            {
-                                BuildChildNode<Embarked>("Embarked", item5);
+            //        foreach (var item3 in item2.Children)
+            //        {
+            //            BuildChildNode<CabinType>("CabinType", item3);
+            //            foreach (var item4 in item3.Children)
+            //            {
+            //                BuildChildNode<FareRate>("FareRate", item4);
 
-                                foreach (var item6 in item5.Children)
-                                {
-                                    BuildChildNode<Mother>("Mother", item6);
+            //                foreach (var item5 in item4.Children)
+            //                {
+            //                    BuildChildNode<FamilySize>("FamilySize", item5);
 
-                                    foreach (var item7 in item6.Children)
-                                    {
-                                        BuildChildNode<AgeOrdinal>("AgeOrdinal", item7);
+            //                    foreach (var item6 in item5.Children)
+            //                    {
+            //                        BuildChildNode<Embarked>("Embarked", item6);
 
-                                        foreach (var item8 in item7.Children)
-                                        {
-                                            BuildChildNode<Titles>("Title", item8);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //                        foreach (var item7 in item6.Children)
+            //                        {
+            //                            BuildChildNode<Mother>("Mother", item7);
+
+            //                            foreach (var item8 in item7.Children)
+            //                            {
+            //                                BuildChildNode<AgeOrdinal>("AgeOrdinal", item8);
+
+            //                                //foreach (var item9 in item8.Children)
+            //                                //{
+            //                                //    BuildChildNode<HaveParch>("HaveParch", item9);
+
+            //                                //    foreach (var item10 in item9.Children)
+            //                                //    {
+            //                                //        BuildChildNode<HaveSibsp>("HaveSibsp", item10);
+            //                                //    }
+            //                                //}
+            //                            }
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
 
             return root;
         }
 
+        public List<string> GetMaximizeGi(List<string> targetFields, List<Passenger> trainData)
+        {
+            var dicofGi = new Dictionary<string, double>();
+            foreach (var fieldName in targetFields)
+            {
+                var gi = GI(fieldName, trainData);
+                dicofGi.Add(fieldName, gi);
+            }
+
+            return dicofGi.OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+        }
     }
 
     public class Passenger
@@ -437,7 +584,7 @@ namespace Titanic.Tests
         public int? Survived { get; set; }
         public int Pclass { get; set; }
         public string Name { get; set; }
-        public Gender? Sex { get; set; }
+        public Sex? Sex { get; set; }
         public int? Age { get; set; }
         public int SibSp { get; set; }
         public int Parch { get; set; }
@@ -500,7 +647,7 @@ namespace Titanic.Tests
         {
             get
             {
-                if (Sex == Gender.Female
+                if (Sex == Tests.Sex.Female
                     && Parch > 0
                     && Age > 18
                     && Title != Titles.Miss
@@ -535,6 +682,31 @@ namespace Titanic.Tests
             }
         }
 
+        public HaveParch HaveParch
+        {
+            get
+            {
+                if (Parch > 0)
+                {
+                    return HaveParch.Yes;
+                }
+
+                return HaveParch.No;
+            }
+        }
+
+        public HaveSibsp HaveSibsp
+        {
+            get
+            {
+                if (SibSp > 0)
+                {
+                    return HaveSibsp.Yes;
+                }
+
+                return HaveSibsp.No;
+            }
+        }
     }
 
     public enum PclassLevel
@@ -547,7 +719,7 @@ namespace Titanic.Tests
         Yes, No
     }
 
-    public enum Gender
+    public enum Sex
     {
         Male, Female
     }
@@ -587,6 +759,16 @@ namespace Titanic.Tests
         Lo, Me, Hi
     }
 
+    public enum HaveParch
+    {
+        Yes, No
+    }
+
+    public enum HaveSibsp
+    {
+        Yes, No
+    }
+
     public static class PassengerExtension
     {
         public static Passenger ToPassenger(this CsvReader csv)
@@ -612,7 +794,7 @@ namespace Titanic.Tests
             string sex = null;
             if (csv.TryGetField<string>("Sex", out sex))
             {
-                p.Sex = (Gender)Enum.Parse(typeof(Gender), sex, true);
+                p.Sex = (Sex)Enum.Parse(typeof(Sex), sex, true);
             }
 
             int? age = null;
@@ -708,10 +890,14 @@ namespace Titanic.Tests
             {
                 //int result = s_Generator.NextDouble() <= P ? 1 : 0;
                 //return result;
-                int result = P > (1 - 0.38) ? 1 : 0;
+                int result = P > 0.5 ? 1 : 0;
                 return result;
             }
-            var ch1 = Children.Where(x => x.FieldName == UnitTest1.GetPropValue(item, fields.First()).ToString()).Single();
+            var field = fields.First();
+            //string.Format("{0}.{1}", pFieldName, node1),
+            var val = UnitTest1.GetPropValue(item, field).ToString();
+            var fieldName = string.Format("{0}.{1}", field, val);
+            var ch1 = Children.Where(x => x.FieldName == fieldName).Single();
             if (ch1.CountNo == 0) return 1;
             return ch1.Predict(item, fields.Skip(1));
         }
