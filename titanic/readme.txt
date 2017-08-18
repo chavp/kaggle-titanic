@@ -1,0 +1,1 @@
+- ติดตั้ง WinPython https://winpython.github.io/
